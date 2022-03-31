@@ -7,7 +7,13 @@ The challenge was to develop an on-demand pipeline for ingesting data into a SQL
 I've developed a REST API to receive and store the data on a PostgreSQL database on-demand.
 
 ## REST API
-The REST API consist of 3 routes: one to send data to be stored, and two to get some specifc information from the database (weekly average number of trips for an area, defined either by a bounding given by coordinates or by a region), as requested
+The REST API consist of 3 routes: one to send data to be stored, and two to get some specifc information from the database (weekly average number of trips for an area, defined either by a bounding given by coordinates or by a region), as requested.
+
+The overall architecture consists of: API Gateway, 3 Lambda Functions (one for each route) and a PostgreSQL on RDS. The functions code for the functions can be found at the functions folder here on git, meanwhile the table ddl is located at the database folder.
+
+The API's endpoint is: https://djc2qulcbe.execute-api.us-east-1.amazonaws.com/v1
+
+All requests made to the API need to contain a credential key sent as a header "x-api-key". The credential key will be included in the email sent to Jobsity, alongside the credentials to access the AWS account.
 
 
 #### POST /trips
@@ -18,6 +24,7 @@ Example:
 curl --request POST \
   --url https://djc2qulcbe.execute-api.us-east-1.amazonaws.com/v1/trips \
   --header 'Content-Type: application/json' \
+  --header 'x-api-key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx' \
   --data '{
 	"records": [
 		{
@@ -56,7 +63,8 @@ Query parameters:
 Example:
 ```bash
 curl --request GET \
-  --url 'https://djc2qulcbe.execute-api.us-east-1.amazonaws.com/v1/trips_by/coordinates?latx=13.001&laty=15.564&lonx=50&lony=52'
+  --url 'https://djc2qulcbe.execute-api.us-east-1.amazonaws.com/v1/trips_by/coordinates?latx=13.001&laty=15.564&lonx=50&lony=52' \
+  --header 'x-api-key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 ```
 
 
@@ -74,4 +82,5 @@ Example:
 ```bash
 curl --request GET \
   --url 'https://djc2qulcbe.execute-api.us-east-1.amazonaws.com/v1/trips_by/region?region=Prague' \
+  --header 'x-api-key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 ```
